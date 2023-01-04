@@ -1,11 +1,15 @@
 package com.peliculas.peliculas.controlador;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
 import com.peliculas.peliculas.entidad.Pelicula;
 import com.peliculas.peliculas.excepciones.MiException;
 import com.peliculas.peliculas.servicio.PeliculaServicio;
+import static java.lang.Integer.parseInt;
 import java.util.List;
 import java.util.Optional;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.NO_CONTENT;
@@ -20,11 +24,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import static org.springframework.web.bind.annotation.RequestMethod.GET;
-import static org.springframework.web.bind.annotation.RequestMethod.POST;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -52,26 +52,25 @@ public class PeliculaControlador {
         return new ResponseEntity<>(peliculaServicio.findById(id), OK);
     }
 
-    @PostMapping(consumes = {MediaType.APPLICATION_JSON_VALUE,
-        MediaType.MULTIPART_FORM_DATA_VALUE})
-    public ResponseEntity<Pelicula> crear(@RequestParam("form1") String miPelicula, @RequestPart("imagenPelicula") MultipartFile foto) throws MiException, Exception {
-        return new ResponseEntity<>(peliculaServicio.agregar(miPelicula, foto), CREATED);
+    @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+    public ResponseEntity<Pelicula> crear(
+            @RequestParam("form1") String pelicula,
+            @RequestParam(required = false, name = "imagenPelicula") MultipartFile foto)
+            throws MiException, Exception {
+        try {
+            Gson gson = new Gson();
+            Pelicula miPelicula = gson.fromJson(pelicula, Pelicula.class);
+            JSONObject jsonObj = new JSONObject(pelicula);
+            JSONArray arrayObject = (JSONArray) jsonObj.get("genero");
+            String miString = arrayObject.toString();
+            String miG = miString.substring(8, 9);
+            Integer miGenero = parseInt(miG);
+            return new ResponseEntity<>(peliculaServicio.agregar(miPelicula, foto, miGenero), CREATED);
+        } catch (JsonSyntaxException jsonSyntaxException) {
+            throw new MiException(jsonSyntaxException.getMessage());
+        }
     }
 
-//    @PostMapping(consumes = {MediaType.APPLICATION_JSON_VALUE,
-//        MediaType.MULTIPART_FORM_DATA_VALUE})
-//    public ResponseEntity<Pelicula> crear(@RequestParam("form1") String miPelicula, @RequestPart("imagenPelicula") MultipartFile foto) throws MiException, Exception {
-//        Gson gson = new Gson();
-//        System.out.println(miPelicula);
-//        Pelicula data =  gson.fromJson(miPelicula, Pelicula.class);
-//        return new ResponseEntity<>(peliculaServicio.agregar(data, foto), CREATED);
-//    }
-//    @PostMapping(consumes = {MediaType.APPLICATION_JSON_VALUE,
-//        MediaType.MULTIPART_FORM_DATA_VALUE})
-//    public ResponseEntity<Pelicula> crear(@RequestParam("form1") Pelicula miPelicula, @RequestPart("imagenPelicula") MultipartFile foto) throws MiException, Exception {
-//
-//        return new ResponseEntity<>(peliculaServicio.agregar(miPelicula, foto), CREATED);
-//    }
     @PutMapping("/{id}")
     public ResponseEntity<Pelicula> actualizar(@PathVariable Long id, @RequestBody Pelicula miPelicula) {
         miPelicula.setId(id);

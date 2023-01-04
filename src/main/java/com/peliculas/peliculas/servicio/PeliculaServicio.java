@@ -1,21 +1,16 @@
 package com.peliculas.peliculas.servicio;
 
-import com.google.gson.Gson;
 import com.peliculas.peliculas.entidad.Genero;
 import com.peliculas.peliculas.entidad.Imagen;
 import com.peliculas.peliculas.entidad.Pelicula;
-import com.peliculas.peliculas.entidad.Personaje;
 import com.peliculas.peliculas.excepciones.MiException;
-import com.peliculas.peliculas.repositorio.GeneroRepositorio;
 import com.peliculas.peliculas.repositorio.PeliculaRepositorio;
-import com.peliculas.peliculas.repositorio.PersonajeRepositorio;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -27,6 +22,8 @@ public class PeliculaServicio {
 
     @Autowired
     private PeliculaRepositorio peliculaRepositorio;
+    @Autowired
+    private GeneroServicio generoServicio;
 
     @Autowired
     private AlmacenServicio almacen;
@@ -48,15 +45,43 @@ public class PeliculaServicio {
         return peliculaRepositorio.findById(id);
     }
 
+    public Date ParseFecha(String fecha) {
+        SimpleDateFormat formato = new SimpleDateFormat("dd/MM/yyyy");
+        Date fechaDate = null;
+        try {
+            fechaDate = formato.parse(fecha);
+        } catch (Exception ex) {
+            System.out.println(ex);
+        }
+        return fechaDate;
+    }
+
+    public Date ConvertDate(Pelicula miPelicula) {
+        Date miDate = miPelicula.getFechaCreacion();
+        Date dateActualizado = new Date();
+        dateActualizado.setDate(miDate.getDate() + 1);
+        dateActualizado.setMonth(miDate.getMonth());
+        dateActualizado.setYear(miDate.getYear());
+        return dateActualizado;
+    }
+
     @Transactional
-    public Pelicula agregar(String miPelicula, MultipartFile foto) throws MiException, Exception {
+    public Set<Genero> agregarGenero(Long miGenero) throws MiException {
+        Genero miGeneroCompleto = generoServicio.buscarId(miGenero);
+        Set<Genero> miSetGenero = new HashSet();
+        miSetGenero.add(miGeneroCompleto);
+        return miSetGenero;
+    }
+
+    @Transactional
+    public Pelicula agregar(Pelicula miPelicula, MultipartFile foto, Integer miGenero) throws MiException, Exception {
         Imagen miImagen = miserv.guardar(foto);
-        Pelicula data= new Pelicula();
-        Gson gson = new Gson();
-        System.out.println(miPelicula);
-        data = gson.fromJson(miPelicula, Pelicula.class);
-        data.setFoto(miImagen);
-        return peliculaRepositorio.save(data);
+        Date nuevo = ConvertDate(miPelicula);
+        miPelicula.setFechaCreacion(nuevo);
+        miPelicula.setFoto(miImagen);
+        Long miGLong = new Long(miGenero);
+        miPelicula.setPeliGenero(agregarGenero(miGLong));
+        return peliculaRepositorio.save(miPelicula);
     }
 
     @Transactional

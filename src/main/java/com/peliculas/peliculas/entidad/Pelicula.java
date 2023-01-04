@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -20,9 +21,8 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
-import javax.persistence.Transient;
+import javax.persistence.Temporal;
 import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.web.multipart.MultipartFile;
 
 @Entity
 @Table(name = "pelicula")
@@ -38,8 +38,9 @@ public class Pelicula implements Serializable {
     private String titulo;
     private boolean eliminado = Boolean.FALSE;
     @Column(name = "fecha_creacion")
-    @DateTimeFormat(pattern = "dd/MM/yyyy")
-    private LocalDateTime fechaCreacion;
+    @Temporal(javax.persistence.TemporalType.DATE)
+    @DateTimeFormat(pattern = "yyyy/MM/dd")
+    private Date fechaCreacion;
     private Integer calificacion;
     @ManyToMany(mappedBy = "peliPersonaje")
     private Set<Personaje> personajePelicula;
@@ -55,7 +56,7 @@ public class Pelicula implements Serializable {
     public Pelicula() {
     }
 
-    public Pelicula(Long id, String imagen, String youtubeTrailerId, String titulo, LocalDateTime fechaCreacion, Integer calificacion, Set<Personaje> personajePelicula, Imagen foto) {
+    public Pelicula(Long id, String imagen, String youtubeTrailerId, String titulo, Date fechaCreacion, Integer calificacion, Set<Personaje> personajePelicula, Imagen foto) {
         this.id = id;
         this.imagen = imagen;
         this.youtubeTrailerId = youtubeTrailerId;
@@ -106,11 +107,11 @@ public class Pelicula implements Serializable {
         this.eliminado = eliminado;
     }
 
-    public LocalDateTime getFechaCreacion() {
+    public Date getFechaCreacion() {
         return fechaCreacion;
     }
 
-    public void setFechaCreacion(LocalDateTime fechaCreacion) {
+    public void setFechaCreacion(Date fechaCreacion) {
         this.fechaCreacion = fechaCreacion;
     }
 
