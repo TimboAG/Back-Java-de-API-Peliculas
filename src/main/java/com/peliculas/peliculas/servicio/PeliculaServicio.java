@@ -1,5 +1,6 @@
 package com.peliculas.peliculas.servicio;
 
+import com.google.gson.Gson;
 import com.peliculas.peliculas.entidad.Genero;
 import com.peliculas.peliculas.entidad.Imagen;
 import com.peliculas.peliculas.entidad.Pelicula;
@@ -48,10 +49,14 @@ public class PeliculaServicio {
     }
 
     @Transactional
-    public Pelicula agregar(Pelicula miPelicula, MultipartFile foto) throws MiException, Exception {
+    public Pelicula agregar(String miPelicula, MultipartFile foto) throws MiException, Exception {
         Imagen miImagen = miserv.guardar(foto);
-        miPelicula.setFoto(miImagen);
-        return peliculaRepositorio.save(miPelicula);
+        Pelicula data= new Pelicula();
+        Gson gson = new Gson();
+        System.out.println(miPelicula);
+        data = gson.fromJson(miPelicula, Pelicula.class);
+        data.setFoto(miImagen);
+        return peliculaRepositorio.save(data);
     }
 
     @Transactional

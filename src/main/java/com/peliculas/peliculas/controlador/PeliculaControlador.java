@@ -1,5 +1,6 @@
 package com.peliculas.peliculas.controlador;
 
+import com.google.gson.Gson;
 import com.peliculas.peliculas.entidad.Pelicula;
 import com.peliculas.peliculas.excepciones.MiException;
 import com.peliculas.peliculas.servicio.PeliculaServicio;
@@ -51,12 +52,26 @@ public class PeliculaControlador {
         return new ResponseEntity<>(peliculaServicio.findById(id), OK);
     }
 
- @PostMapping( consumes = {MediaType.APPLICATION_JSON_VALUE,
-            MediaType.MULTIPART_FORM_DATA_VALUE})
-        public ResponseEntity<Pelicula> crear(@RequestPart("form1") Pelicula miPelicula, @RequestPart("imagenPelicula") MultipartFile foto) throws MiException, Exception {
+    @PostMapping(consumes = {MediaType.APPLICATION_JSON_VALUE,
+        MediaType.MULTIPART_FORM_DATA_VALUE})
+    public ResponseEntity<Pelicula> crear(@RequestParam("form1") String miPelicula, @RequestPart("imagenPelicula") MultipartFile foto) throws MiException, Exception {
         return new ResponseEntity<>(peliculaServicio.agregar(miPelicula, foto), CREATED);
     }
 
+//    @PostMapping(consumes = {MediaType.APPLICATION_JSON_VALUE,
+//        MediaType.MULTIPART_FORM_DATA_VALUE})
+//    public ResponseEntity<Pelicula> crear(@RequestParam("form1") String miPelicula, @RequestPart("imagenPelicula") MultipartFile foto) throws MiException, Exception {
+//        Gson gson = new Gson();
+//        System.out.println(miPelicula);
+//        Pelicula data =  gson.fromJson(miPelicula, Pelicula.class);
+//        return new ResponseEntity<>(peliculaServicio.agregar(data, foto), CREATED);
+//    }
+//    @PostMapping(consumes = {MediaType.APPLICATION_JSON_VALUE,
+//        MediaType.MULTIPART_FORM_DATA_VALUE})
+//    public ResponseEntity<Pelicula> crear(@RequestParam("form1") Pelicula miPelicula, @RequestPart("imagenPelicula") MultipartFile foto) throws MiException, Exception {
+//
+//        return new ResponseEntity<>(peliculaServicio.agregar(miPelicula, foto), CREATED);
+//    }
     @PutMapping("/{id}")
     public ResponseEntity<Pelicula> actualizar(@PathVariable Long id, @RequestBody Pelicula miPelicula) {
         miPelicula.setId(id);
