@@ -19,32 +19,32 @@ import org.springframework.web.multipart.MultipartFile;
 
 @Service
 public class PeliculaServicio {
-
+    
     @Autowired
     private PeliculaRepositorio peliculaRepositorio;
     @Autowired
     private GeneroServicio generoServicio;
-
+    
     @Autowired
     private AlmacenServicio almacen;
     @Autowired(required = true)
     private ImagenServicio miserv;
-
+    
     @Transactional
     public List<Pelicula> findAllCustom() {
         return peliculaRepositorio.findAllCustom();
     }
-
+    
     @Transactional
     public List<Pelicula> listar() {
         return peliculaRepositorio.findAll();
     }
-
+    
     @Transactional
     public Optional<Pelicula> findById(Long id) {
         return peliculaRepositorio.findById(id);
     }
-
+    
     public Date ParseFecha(String fecha) {
         SimpleDateFormat formato = new SimpleDateFormat("dd/MM/yyyy");
         Date fechaDate = null;
@@ -55,7 +55,7 @@ public class PeliculaServicio {
         }
         return fechaDate;
     }
-
+    
     public Date ConvertDate(Pelicula miPelicula) {
         Date miDate = miPelicula.getFechaCreacion();
         Date dateActualizado = new Date();
@@ -64,7 +64,7 @@ public class PeliculaServicio {
         dateActualizado.setYear(miDate.getYear());
         return dateActualizado;
     }
-
+    
     @Transactional
     public Set<Genero> agregarGenero(Long miGenero) throws MiException {
         Genero miGeneroCompleto = generoServicio.buscarId(miGenero);
@@ -72,7 +72,7 @@ public class PeliculaServicio {
         miSetGenero.add(miGeneroCompleto);
         return miSetGenero;
     }
-
+    
     @Transactional
     public Pelicula agregar(Pelicula miPelicula, MultipartFile foto, Integer miGenero) throws MiException, Exception {
         Imagen miImagen = miserv.guardar(foto);
@@ -81,16 +81,18 @@ public class PeliculaServicio {
         miPelicula.setFoto(miImagen);
         Long miGLong = new Long(miGenero);
         miPelicula.setPeliGenero(agregarGenero(miGLong));
+        String rutaImagen = almacen.almacenarArchivo(foto);
+        miPelicula.setImagen(rutaImagen);
         return peliculaRepositorio.save(miPelicula);
     }
-
+    
     @Transactional
     public Pelicula actualizar(Pelicula miPelicula) {
         Pelicula miObjPeli = peliculaRepositorio.getById(miPelicula.getId());
         BeanUtils.copyProperties(miPelicula, miObjPeli);
         return peliculaRepositorio.save(miObjPeli);
     }
-
+    
     @Transactional
     public Pelicula eliminar(Long id) throws MiException {
         Optional<Pelicula> miOptional = peliculaRepositorio.findById(id);
@@ -103,7 +105,7 @@ public class PeliculaServicio {
         }
         return null;
     }
-
+    
     @Transactional
     public Pelicula alta(Long id) throws MiException {
         Optional<Pelicula> miOptional = peliculaRepositorio.findById(id);
@@ -117,7 +119,7 @@ public class PeliculaServicio {
         }
         return null;
     }
-
+    
     @Transactional
     public Pelicula baja(Long id) throws MiException {
         Optional<Pelicula> miOptional = peliculaRepositorio.findById(id);
@@ -131,7 +133,7 @@ public class PeliculaServicio {
         }
         return null;
     }
-
+    
     public Pelicula getOne(Long id) {
         return peliculaRepositorio.getOne(id);
     }

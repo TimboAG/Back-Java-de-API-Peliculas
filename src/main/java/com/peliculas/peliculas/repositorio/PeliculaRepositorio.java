@@ -12,8 +12,8 @@ public interface PeliculaRepositorio extends JpaRepository<Pelicula, Long> {
 
     @Query("SELECT p FROM Pelicula p WHERE p.eliminado = 'FALSE' ")
     public List<Pelicula> findAllCustom();
-
-    public Optional<Pelicula> findById(Long id);
+    
+      public Optional<Pelicula> findById(Long id);
 
 
 }

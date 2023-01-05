@@ -31,7 +31,6 @@ import org.springframework.web.multipart.MultipartFile;
 @RestController
 @RequestMapping("/pelicula")
 @CrossOrigin("*")
-
 public class PeliculaControlador {
 
     @Autowired
@@ -59,7 +58,7 @@ public class PeliculaControlador {
             throws MiException, Exception {
         try {
             Gson gson = new Gson();
-            Pelicula miPelicula = gson.fromJson(pelicula, Pelicula.class);
+           Pelicula miPelicula = gson.fromJson(pelicula, Pelicula.class);
             JSONObject jsonObj = new JSONObject(pelicula);
             JSONArray arrayObject = (JSONArray) jsonObj.get("genero");
             String miString = arrayObject.toString();

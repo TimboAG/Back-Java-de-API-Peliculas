@@ -36,7 +36,6 @@ public class GeneroServicio {
 
     @Transactional
     public Genero buscarId(Long id) throws MiException {
-        System.out.println("Esto es id genero" + id);
         Optional<Genero> miOptional = generoRepositorio.findById(id);
         try {
             Genero miObj = new Genero();
