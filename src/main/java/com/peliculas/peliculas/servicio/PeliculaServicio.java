@@ -4,6 +4,7 @@ import com.peliculas.peliculas.entidad.Genero;
 import com.peliculas.peliculas.entidad.Imagen;
 import com.peliculas.peliculas.entidad.Pelicula;
 import com.peliculas.peliculas.excepciones.MiException;
+import com.peliculas.peliculas.repositorio.ImagenRepositorio;
 import com.peliculas.peliculas.repositorio.PeliculaRepositorio;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -24,6 +25,8 @@ public class PeliculaServicio {
     private PeliculaRepositorio peliculaRepositorio;
     @Autowired
     private GeneroServicio generoServicio;
+    @Autowired
+    private ImagenRepositorio imagenRepositorio;
     
     @Autowired
     private AlmacenServicio almacen;
@@ -87,12 +90,31 @@ public class PeliculaServicio {
     }
     
     @Transactional
-    public Pelicula actualizar(Pelicula miPelicula) {
+    public Pelicula actualizar(Pelicula miPelicula, Long id) {
+        miPelicula.setId(id);
         Pelicula miObjPeli = peliculaRepositorio.getById(miPelicula.getId());
+        Imagen imagen = new Imagen();        
+        Optional<Imagen> respuesta = imagenRepositorio.findById(id);
+        if (respuesta.isPresent()) {
+            imagen = respuesta.get();
+        }
+        String nombreArchivo = imagen.getNombre();
+        miPelicula.setFoto(imagen);
+        miPelicula.setImagen(nombreArchivo);
         BeanUtils.copyProperties(miPelicula, miObjPeli);
+        miObjPeli.setImagen(miPelicula.getImagen());
+        miObjPeli.setFoto(miPelicula.getFoto());
         return peliculaRepositorio.save(miObjPeli);
     }
-    
+//     @Transactional
+//    public Pelicula actualizar(Pelicula miPelicula, MultipartFile foto,Integer miGenero) {
+//        Pelicula miObjPeli = peliculaRepositorio.getById(miPelicula.getId());
+//        BeanUtils.copyProperties(miPelicula, miObjPeli);
+//        miObjPeli.setImagen(miPelicula.getImagen());
+//        miObjPeli.setFoto(miPelicula.getFoto());      
+//        return peliculaRepositorio.save(miObjPeli);
+//    }
+
     @Transactional
     public Pelicula eliminar(Long id) throws MiException {
         Optional<Pelicula> miOptional = peliculaRepositorio.findById(id);

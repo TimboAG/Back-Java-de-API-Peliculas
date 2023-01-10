@@ -36,9 +36,4 @@ public class ImagenControlador {
         return new ResponseEntity<>(imagen, headers, HttpStatus.OK);
     }
 
-//   @GetMapping("/imagen/{id}")
-//    public ResponseEntity<Resource> imagenAlmacen(@PathVariable Long id) {
-//      
-//        return new ResponseEntity<>(almacen.cargarComoRecurso(nombreArchivo), HttpStatus.OK);
-//    }
 }

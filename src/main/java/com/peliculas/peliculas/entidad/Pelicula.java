@@ -5,6 +5,7 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -42,10 +43,11 @@ public class Pelicula implements Serializable {
     @JoinTable(name = "pelicula_genero",
             joinColumns = @JoinColumn(name = "pelicula_id"),
             inverseJoinColumns = @JoinColumn(name = "genero_id"))
+    
     @ManyToMany(fetch = FetchType.LAZY)
     @JsonBackReference
     private Set<Genero> peliGenero = new HashSet();
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private Imagen foto;
 
     public Pelicula() {

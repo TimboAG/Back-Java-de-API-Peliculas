@@ -58,7 +58,7 @@ public class PeliculaControlador {
             throws MiException, Exception {
         try {
             Gson gson = new Gson();
-           Pelicula miPelicula = gson.fromJson(pelicula, Pelicula.class);
+            Pelicula miPelicula = gson.fromJson(pelicula, Pelicula.class);
             JSONObject jsonObj = new JSONObject(pelicula);
             JSONArray arrayObject = (JSONArray) jsonObj.get("genero");
             String miString = arrayObject.toString();
@@ -70,10 +70,28 @@ public class PeliculaControlador {
         }
     }
 
+//    @PutMapping(value = "/{id}", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+//    public ResponseEntity<Pelicula> actualizar(@PathVariable Long id, @RequestParam("form1") String pelicula,
+//            @RequestParam(required = false, name = "imagenPelicula") MultipartFile foto) {
+//
+//        try {
+//            Gson gson = new Gson();
+//            Pelicula miPelicula = gson.fromJson(pelicula, Pelicula.class);
+//            JSONObject jsonObj = new JSONObject(pelicula);
+//            JSONArray arrayObject = (JSONArray) jsonObj.get("genero");
+//            String miString = arrayObject.toString();
+//            String miG = miString.substring(8, 9);
+//            Integer miGenero = parseInt(miG);
+//            miPelicula.setId(id);
+//            return new ResponseEntity<>(peliculaServicio.actualizar(miPelicula, foto, miGenero), OK);
+//        } catch (JsonSyntaxException jsonSyntaxException) {
+//            throw new MiException(jsonSyntaxException.getMessage());
+//        }
+//
+//    }
     @PutMapping("/{id}")
     public ResponseEntity<Pelicula> actualizar(@PathVariable Long id, @RequestBody Pelicula miPelicula) {
-        miPelicula.setId(id);
-        return new ResponseEntity<>(peliculaServicio.actualizar(miPelicula), OK);
+        return new ResponseEntity<>(peliculaServicio.actualizar(miPelicula, id), OK);
     }
 
     @DeleteMapping("/{id}")
