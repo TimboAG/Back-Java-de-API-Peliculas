@@ -106,14 +106,7 @@ public class PeliculaServicio {
         miObjPeli.setFoto(miPelicula.getFoto());
         return peliculaRepositorio.save(miObjPeli);
     }
-//     @Transactional
-//    public Pelicula actualizar(Pelicula miPelicula, MultipartFile foto,Integer miGenero) {
-//        Pelicula miObjPeli = peliculaRepositorio.getById(miPelicula.getId());
-//        BeanUtils.copyProperties(miPelicula, miObjPeli);
-//        miObjPeli.setImagen(miPelicula.getImagen());
-//        miObjPeli.setFoto(miPelicula.getFoto());      
-//        return peliculaRepositorio.save(miObjPeli);
-//    }
+
 
     @Transactional
     public Pelicula eliminar(Long id) throws MiException {
