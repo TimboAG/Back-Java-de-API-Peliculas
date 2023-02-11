@@ -2,7 +2,7 @@ package com.peliculas.peliculas.enumeracion;
 
 
 public enum Rol {
-     USER,
-    ADMIN, 
+    ROLE_USER,
+    ROLE_ADMIN, 
   
 }

@@ -23,7 +23,7 @@ public class User   {
     private Long id;
 
     @NotBlank
-    @Size(max = 40)
+    @Size(max = 20)
     private String name;
 
     @NotBlank

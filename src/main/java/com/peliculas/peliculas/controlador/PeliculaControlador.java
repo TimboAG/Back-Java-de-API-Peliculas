@@ -16,6 +16,7 @@ import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.http.HttpStatus.OK;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -54,6 +55,7 @@ public class PeliculaControlador {
     }
 
     @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Pelicula> crear(
             @RequestParam("form1") String pelicula,
             @RequestParam(required = false, name = "imagenPelicula") MultipartFile foto)
@@ -72,18 +74,20 @@ public class PeliculaControlador {
         }
     }
 
-
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Pelicula> actualizar(@PathVariable Long id, @RequestBody Pelicula miPelicula) {
         return new ResponseEntity<>(peliculaServicio.actualizar(miPelicula, id), OK);
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Pelicula> eliminar(@PathVariable Long id) throws Exception {
         return new ResponseEntity<>(peliculaServicio.eliminar(id), NO_CONTENT);
     }
 
     @PutMapping("/alta/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Pelicula> alta(@PathVariable Long id) {
         try {
             return new ResponseEntity<>(peliculaServicio.alta(id), OK);
@@ -94,6 +98,7 @@ public class PeliculaControlador {
     }
 
     @PutMapping("/baja/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Pelicula> baja(@PathVariable Long id) throws Exception {
         try {
             return new ResponseEntity<>(peliculaServicio.baja(id), OK);

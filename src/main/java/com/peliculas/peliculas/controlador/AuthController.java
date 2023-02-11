@@ -24,14 +24,19 @@ import com.peliculas.peliculas.entidad.RoleUser;
 import com.peliculas.peliculas.entidad.User;
 import com.peliculas.peliculas.enumeracion.Rol;
 import com.peliculas.peliculas.excepciones.AppException;
+import com.peliculas.peliculas.seguridad.JwtUtils;
+import com.peliculas.peliculas.servicio.UserDetailsImpl;
 
 import javax.validation.Valid;
 import java.net.URI;
 import java.util.Collections;
-
+import java.util.List;
+import java.util.stream.Collectors;
+import org.springframework.web.bind.annotation.CrossOrigin;
 
 @RestController
 @RequestMapping("/api/auth")
+@CrossOrigin(origins = "http://localhost:3000")
 public class AuthController {
 
     @Autowired
@@ -48,22 +53,32 @@ public class AuthController {
 
     @Autowired
     JwtTokenProvider tokenProvider;
+    @Autowired
+    JwtUtils jwtUtils;
 
     @PostMapping("/signin")
-    public ResponseEntity<?> iniciarSession(@Valid @RequestBody LoginRequest loginRequest) {
+    public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
+
         Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        loginRequest.getUsernameOrEmail(),
-                        loginRequest.getPassword()
-                )
-        );
+                new UsernamePasswordAuthenticationToken(loginRequest.getUsernameOrEmail(), loginRequest.getPassword()));
+
         SecurityContextHolder.getContext().setAuthentication(authentication);
-        String jwt = tokenProvider.generateToken(authentication);
-        return ResponseEntity.ok(new JwtAuthenticationResponse(jwt));
+        String jwt = jwtUtils.generateJwtToken(authentication);
+
+        UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+        List<String> roles = userDetails.getAuthorities().stream()
+                .map(item -> item.getAuthority())
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok(new JwtAuthenticationResponse(jwt,
+                userDetails.getId(),
+                userDetails.getUsername(),
+                userDetails.getEmail(),
+                roles));
     }
 
-@PostMapping(path = "/signup", consumes = "application/json")
-public ResponseEntity<?> registrarUsuario(@Valid @RequestBody SignUpRequest signUpRequest) {
+    @PostMapping(path = "/signup", consumes = "application/json")
+    public ResponseEntity<?> registrarUsuario(@Valid @RequestBody SignUpRequest signUpRequest) {
         if (userRepository.existsByUsername(signUpRequest.getUsername())) {
             return new ResponseEntity(new ApiResponse(false, "El nombre de usuario ya existe!"),
                     HttpStatus.BAD_REQUEST);
@@ -75,7 +90,7 @@ public ResponseEntity<?> registrarUsuario(@Valid @RequestBody SignUpRequest sign
         User user = new User(signUpRequest.getName(), signUpRequest.getUsername(),
                 signUpRequest.getEmail(), signUpRequest.getPassword());
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-        RoleUser userRole = roleRepository.findByName(Rol.USER)
+        RoleUser userRole = roleRepository.findByName(Rol.ROLE_USER)
                 .orElseThrow(() -> new AppException("El rol no se encuentra"));
         user.setRoles(Collections.singleton(userRole));
         User result = userRepository.save(user);
@@ -84,4 +99,5 @@ public ResponseEntity<?> registrarUsuario(@Valid @RequestBody SignUpRequest sign
                 .buildAndExpand(result.getUsername()).toUri();
         return ResponseEntity.created(location).body(new ApiResponse(true, "El usuario ya se encuentra registrado"));
     }
+
 }
