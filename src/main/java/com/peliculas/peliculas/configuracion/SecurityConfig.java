@@ -94,11 +94,17 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     public void configure(HttpSecurity http) throws Exception {
-        http.cors().and().csrf().disable()
-                .exceptionHandling().authenticationEntryPoint(unauthorizedHandler).and()
-                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
-                .authorizeRequests().antMatchers("/**").permitAll()
-                .anyRequest().authenticated();
+//        http.cors().and().csrf().disable()
+//                .exceptionHandling().authenticationEntryPoint(unauthorizedHandler).and()
+//                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
+//                .authorizeRequests().antMatchers("/api/auth/**").permitAll()
+//                .anyRequest().authenticated();
+
+http.cors().and().csrf().disable()
+        .authorizeRequests()
+        .antMatchers("/**").permitAll()
+        .antMatchers("/pelicula/**").hasRole("ADMIN")
+        .anyRequest().authenticated();
 
 http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
 
